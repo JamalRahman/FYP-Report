@@ -1,0 +1,49 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage{tabularx} % extra features for tabular environment
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{multicol}
+\usepackage{setspace}
+\usepackage{subfig}
+\usepackage[
+    doi=false,
+    isbn=false,
+    url=false,
+    sorting=none
+]{biblatex}
+\usepackage{fancyhdr}
+
+\usepackage[margin=2.5cm]{geometry}
+\graphicspath{images/}
+\addbibresource{references.bib}
+
+\pagenumbering{roman}
+\begin{document}
+
+\input{title.tex}
+
+\onehalfspacing
+\input{preamble}
+
+\tableofcontents
+\listoffigures
+
+\chapter{Introduction}
+\pagenumbering{arabic}
+\input{chapters/introduction.tex}
+
+\chapter{Background}
+\input{chapters/background.tex}
+
+\chapter{Implementation}
+\input{chapters/implementation.tex}
+
+
+\appendix
+
+\chapter{Appendix Title}
+
+\printbibliography
+
+\end{document}

@@ -1,0 +1,91 @@
+A preeminent introduction to ABM is given by Macal and North (2005), which provides a thorough discussion on what defines an agent. In brief, an agent is an entity which acts independently within an environment:
+
+\section{Agents}
+Agents are governed by a set of rules which dictate how they react to their environment and to other agents. Some agents have the ability to perceive and store memory of the environment, as well as events within it, and may adapt their behaviour according to their perceptions \cite{Macal2005TutorialSimulation}. An agent need not be realised specifically as a human; a simulated road network will model a vehicle as an agent, and some models may model collections of jointly-acting people, such as families, as agents \cite{Zhang2009Agent-basedEvacuation}. As long as the collective-agent acts as an independent individual this is accepted.
+
+Agent behaviour can be described at different levels of complexity; it is impracticable to describe the full decision making process behind an agent's actions, accounting for a large set of memories and perceptions. Primitive agents may be modelled as finite state machines \cite{Ren2009Agent-BasedEvacuation}, and in many cases a simple behavioural model is built from a statistical estimation of the agent's behaviour \cite{Dawson2011AnManagement}.
+
+ABM's benefits as a simulation technique are due to its natural ability to capture emergence, its parallels to real-world systems, and its flexibility \cite{Bonabeau2002Agent-basedSystems.}. An emergent phenomenon, by definition, cannot be reduced to the sum of its parts as it is the result of interactions that are decided upon at execution time. The parallels between an agent-based model and a real world system are intrinsic, agents are designed to directly mimic real participants' behaviour. Lastly such systems are flexible in scale; it's easy to increase the number of agents, change the environment or tweak the simulation parameters without making any fundamental changes to the model. Because of this, ABM is notorious for excelling at posing `what if' questions and investigating hypothetical scenarios.
+
+\section{Environments}
+
+Careful consideration of the real world must be taken when designing the fundamental architecture of an ABM - most importantly when choosing the agents' environment. Some applications require a minimal environment, such as in a \textit{supply chain model} which sets agents as \textit{factories, retailers, consumers, etc} and allows them to communicate with each other \cite{Macal2006TutorialAgents}. Here the environment need only be the collection of agents themselves. Alternatively environments may take on a more literal representation, providing a spatial description of a physical environment as is more commonly seen when studying ecological and social behaviour \cite{Macal2005TutorialSimulation}.
+
+When simulating physical, ecological, and sociological phenomena, environments typically fall into three categories: continuous, cellular automata (CA) and network. Continous representations use a continous $(x,y)$ coordinate system within which agents act. CA is a discrete environment, chunking space into a grid. CA models make for a trade off between model accuracy and computational ease; agents reside within a grid cell and naturally have eight surrounding cells. This limitation allows for a simple model that is computationally efficient while still approximate of real space. Lastly, many simulation applications can be realised on a network, or graph. Across all environment representations, the timestep of simulation can be adjusted as a trade off between computational load and model accuracy.
+
+
+Evacuation via a road network quite self-evidently lends itself to accurate modelling using a network as illustrated by Figure \ref{fig:test_network}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=10cm]{test_network.png}
+    \caption{A realistic test network \cite{Zhang2009Agent-basedEvacuation}}
+    \label{fig:test_network}
+\end{figure}
+
+\section{Traffic Implementation}
+
+Simulation research is a two-step process: a simulation must first be designed from known principles, so that is accurately reflects the real world; secondly, the accurate simulation can hence be used to run virtual experiments and learn more about the real world. This project is an exercise in both aspects of simulation science, with a focus on the latter. In order to perform research, a robust agent-based model must first be constructed.
+
+\subsection{Existing Software and Frameworks}
+
+In the field of ABM, there is a distinct split between commercial systems and programming frameworks. Typically, researchers use frameworks to make new advancements in their respective problem areas, and development studios implement new techniques into user friendly commercial systems, often with government officials in mind as end users.
+
+\subsubsection{CORSIM, VISSIM and Paramics}
+
+CORSIM, VISSIM and Paramics are three commonly used commercial software packages.
+
+CORSIM is one of the oldest traffic models in use today. It was developed in the 1970s by the US Federal Highway Administration. In contrast, VISSIM is the youngest of the three software options, developed by a private German company. All three of the systems specialise in producing a highly representative simulation of the roads. Their focus is on such matters as modelling the dynamics of different classes of vehicle and other low level details that allow them to accurately model the flow of traffic through individual complex intersections, and small networks \cite{Choa2004CORSIMYou}.
+CORSIM, VISSIM and Paramics all allow for programming of the simulation parameters, and they provide comprehensive 2D and 3D visualisation features.
+
+
+\subsubsection{MASON}
+
+For researchers who need to build models from the ground up, none of CORSIM, VISSIM or Paramics are suitable, as the three models are inflexible towards implementing novel strategies. For such demands, frequently used ABM software frameworks include NetLogo, MASON (Multi-Agent Simulator of Neighbourhoods/Networks) and the Repast Suite. Netlogo uses a proprietary scripting language, whereas MASON and Repast provide libraries for working in Java. While  both solutions provide a core simulation engine, data structures for common environment representations, and visualisation tools, Repast was deemed to be unsuitable for this project; rather than import a library of useful code to use in a system, Repast simulations must be run from within the Repast Suite's own program, and Java files can be written to configure the nature of the simulation that is ran from the Repast main suite. Conversely, MASON operates as a typical Java library does, allowing importing of MASON packages to add features into our own programs. An overview of how MASON works within the project is given in Chapter 3.
+
+
+\subsection{Environment Representation}
+A road network can be represented as a directed graph $G (N,E)$, where $N$ is the set of nodes (junctions) on the network and $E$ the set of edges (road connections) between all junctions. Nodes $n \in N$ have coordinates $(x,y)$ and edges $e \in E$ have corresponding lengths $l$ \cite{Madireddy2011AnManagement}. Edges and nodes may possess additional properties, such as speed limits and lane counts.
+
+Simulations are often tested on synthetic network topologies, generated to mimic common road patterns \cite{Zhang2009Agent-basedEvacuation}, alternatively researchers can test on a real world road network extracted from GIS data \cite{Chen2006Agent-BasedKeys}. It is a good idea to develop the system on test networks and then apply the simulation to a real world case study.
+
+\subsection{Vehicle behaviour}
+A vehicle's goal is to reach a `safe' node, at which point it is deemed to have evacuated successfully. One approach is to define a sub-region of the network to be evacuated, and any node not in this subset is hence in the set of safe nodes. \cite{Chen2008Agent-basedStrategies} Another more common approach is to identify which roads act as exits to the region which is being modelled, and mark their corresponding nodes as safe \cite{Madireddy2011AnManagement,Dawson2011AnManagement}.
+Agents will choose their route from their source via a simple search algorithm, such as A*. In an age of smartphones and sat-nav this path finding assumption is appropriate.
+
+Multiple algorithms exist for modelling driving behaviour. Older and more complex models use the Nagel-Schrekenberg (N-S) cellular automata model \cite{Nagel1992ATraffic,Nagel1998Two-laneApproach}. The N-S model works by dividing the graph's edges into discrete cells, each large enough to contain one car. Agents accelerate until they hit the speed limit or until their speed would cause a collision with the leading car in the next timestep. To account for fluctuations in traffic speed, the N-S algorithm gives a random chance of overbreaking to decelerate a car more than necessary.
+
+PARAMICS bases its car-following mechanism on the Fritzsche model \cite{Fritzsche1994ASimulation} which characterises five driving modes that dictate the agent behaviour, however the resultant behaviour is the same as with the N-S algorithm. 
+
+Recent research has used continuous adaptations of the N-S algorithm, forgoing the limitations applied by CA, or have opted to use very simple approximations of the algorithm \cite{Durak2015OptimizingAlgorithms,Madireddy2011AnManagement}.
+
+
+\section{ABM Experiments}
+
+With robust digital models able to accurately model the nuance of the physical world, researchers can leverage the emergence of ABM to pose questions about a hypothetical scenario and solve the problems that arise. 
+
+The most important metric in evacuation research is \textit{clearance time}, which is the total time elapsed between the first evacuee leaving their source to the last evacuee reaching their destination \cite{Shendarkar2006CrowdReality,Madireddy2011AnManagement}.
+
+\subsection{Scheduling}
+Chen and Zhan (2006) focus on whether clearance time can be reduced by scheduling subsections of the network to evacuate separately in a \textit{staged evacuation}, as opposed to a \textit{simultaneous evacuation} where all buildings evacuate simultaneously \cite{Chen2008Agent-basedStrategies}. Strategies were compared under different population loads and across different network topologies: a uniform grid as in figure \ref{fig:4zones}, a series of nested and interconnected uniform rings, and a real road network within a city in the US. The experiment performed staged evacuations across \textit{four arbitrary zones} of roughly equal area - only testing the sequenced strategies in which one zone is ordered to evacuate at a time, and the simultaneous strategy where all four zones evacuate at once. The study reveals that there was no general purpose superlative strategy but at high populations, as roads become congested, the staged evacuation strategy is more effective than a simultaneous evacuation for both a grid network and a real road network. Work has been made towards optimising staging at a higher resolution, however using a computationally lightweight top-down linear-programming approach which subsequently loses the emergence from a microscopic model's agent interactions \cite{Bish2014OptimalRouting}.
+
+\subsection{Flow management \& Routing}
+Staged evacuations require planning and prior informing of the population, however in addition to scheduling, authorities are also able to manipulate the road network during an ongoing evacuation to increase the effectiveness of evacuation. The contraflow strategy reroutes the network by reversing the direction of lanes which are inbound to the evacuation area, turning them into additional outbound routes. A solution to the contraflow problem is a network configuration where each edge is directed such that the network's clearance time is a minimum. Contraflow has received a large amount of research from a modelling standpoint \cite{Cova2003ARouting,SanghoKim2008ContraflowPlanning} as well as from a managerial and logistical perspective, being implemented during real emergency scenarios and it is considered a logistically viable management solution \cite{Wolshon2001One-Way-Out:Evacuation}.
+
+Contraflow is a largely solved problem, established as a useful strategy by macroscopic models
+using heuristic approaches to reorganise an optimal configuration of the network. \cite{SanghoKim2008ContraflowPlanning} For our purposes we need not understand the algorithms that achieve solutions to the contraflow problem.
+An additional motivation for microsimulation is given by Madireddy, Medeiros, and Kumara (2011) who explain that officials from Florida implemented contraflow to mitigate congestion during hurricane Floyd, which did not work in this case. The authorities turned to the CORSIM platform which was used to organically demonstrate the flow in the contraflow topology. \cite{Madireddy2011AnManagement}
+The success of contraflow inspired Madireddy et al. to use ABM to develop and test new traffic management strategies; their paper introduces \textit{throttling}, a technique where authorities temporarily close roads that become too congested, and reopening the road once the congestion has sufficiently lowered.
+
+\begin{figure}[ht]
+    \centering
+    \subfloat[Four-zone grid network]{{\includegraphics[width=5cm]{4zones.png} }\label{fig:4zones}}%
+    \qquad
+    \subfloat[Throttled network]{{\includegraphics[width=5cm]{throttle_example.png} }\label{fig:throttle_example}}%
+    \caption{Example topologies for researching evacuation scheduling, and flow management. (a) Chen and Zhan (2006) (b) Madireddy et al. (2011)}
+\end{figure}
+
+A fundamental aspect of the Madireddy et al. throttling model is \textit{agent greed}. Zhang, Ukkusuri and Chan (2009) present a model which models the population with varying levels of \textit{greed}. In this context, a greedy agent is one who diverts from their route depending on their perception of their route's level of congestion. Zhang et al. model agents as being either 100\% greedy, and always following the lesser congested road, or 50\% greedy and hence having a 50\% chance of following a less congested road. It was found that greedy agents had faster individual evacuation times but the map's clearance time was greater as the population of greedy agents increased. 
+
+Zhang et al. do not draw any conclusions as to whether greedy agents make for a more accurate or inaccurate representation of human drivers, however Madireddy et al. assume humans to be greedy, representing the agents in their throttling model as 100\% greedy agents. The experiment by Madireddy et al. tested a range of congestion coefficient thresholds for closing and reopening roads, from 0 to 1. Results found that the effect of throttling was heavily dependent on network topology, as the strategy typically improved clearance time but risked throttling critical roads which may isolate subsections of the graph from the evacuation destination. Throttling was found to perform comparably with contraflow, but throttling may have an advantage by being more easily implemented in reality, and that adaptation and response to changing traffic conditions will be more logistically feasible for throttling than for contraflow.
+
