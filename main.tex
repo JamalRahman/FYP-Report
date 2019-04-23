@@ -1,11 +1,11 @@
 \documentclass[12pt,a4paper]{report}
+
+\usepackage[utf8]{inputenc}
 \usepackage{tabularx} % extra features for tabular environment
 \usepackage{amsmath}
 \usepackage{graphicx}
-\usepackage[utf8]{inputenc}
 \usepackage{multicol}
 \usepackage{setspace}
-\usepackage{subfig}
 \usepackage[
     doi=false,
     isbn=false,
@@ -13,10 +13,17 @@
     sorting=none
 ]{biblatex}
 \usepackage{fancyhdr}
-
+\usepackage[ruled, vlined]{algorithm2e}
 \usepackage[margin=2.5cm]{geometry}
+\usepackage{appendix}
+\usepackage{verbatim}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\newcommand{\code}[1]{\texttt{#1}}
 \graphicspath{images/}
 \addbibresource{references.bib}
+\emergencystretch=1em
 
 \pagenumbering{roman}
 \begin{document}
@@ -28,22 +35,54 @@
 
 \tableofcontents
 \listoffigures
+\listofalgorithms
 
 \chapter{Introduction}
 \pagenumbering{arabic}
+\label{ch:introduction}
 \input{chapters/introduction.tex}
 
 \chapter{Background}
+\label{ch:background}
 \input{chapters/background.tex}
 
+\chapter{Project Specification}
+\label{ch:project_spec}
+\input{chapters/project_spec.tex}
+
+\chapter{Design}
+\label{ch:design}
+\input{chapters/design.tex}
+
 \chapter{Implementation}
+\label{ch:implementation}
 \input{chapters/implementation.tex}
 
+\chapter{Experimentation}
+\label{ch:experimentation}
+\input{chapters/experimentation.tex}
 
-\appendix
+\chapter{Discussion}
+\label{ch:discussion}
+\input{chapters/discussion.tex}
 
-\chapter{Appendix Title}
+\chapter{Conclusion}
+\label{ch:conclusion}
+\input{chapters/conclusion.tex}
 
 \printbibliography
+
+\appendix
+\chapter{Structure of Project Directory}
+\label{appendix:directory}
+\input{appendicies/directory.tex}
+
+\chapter{List of Configurable Parameters}
+\label{appendix:parameters}
+\input{appendicies/parameters.tex}
+
+\chapter{Complete System Class Diagram}
+\label{appendix:class_diagram}
+\input{appendicies/class_diagram.tex}
 
 \end{document}

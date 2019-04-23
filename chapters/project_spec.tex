@@ -1,0 +1,76 @@
+Simulation research is a two-step process: a simulation must first be designed from known principles, so that it accurately reflects the real world; secondly, the accurate simulation can hence be used to run virtual experiments and learn more about the real world. This project is an exercise in both aspects of simulation science. Here we will state the formal specification of the project, what it aims to achieve and what features it must have to accomplish its task.
+
+Previous chapters discussed the problem space around which this project is exploring, but in explicit terms: commercial evacuation software provides the means to model the likely outcome of traffic on a road network, but is inflexible and ill-suited for evaluating the impact of novel strategies and factors in an evacuation scenario. Hence, the project aims to produce a configurable simulation for investigating road network evacuation strategies. Furthermore, the simulation is to experimentally evaluate the throttling traffic management strategy and investigate the impacts of agent greed on clearance time.
+\section{Problem Definition}
+
+\section{System Specification}
+
+For a simulation package to form a basis for experimentation, the system must be flexible enough to capture a range of realistic and targeted scenarios in the real-world problem space. The system will model an input of some directed graph as a road network and, using the principles of traffic modelling discussed in Chapter \ref{ch:background}, will run through an evacuation scenario to completion when all cars have evacuated the network.
+
+In addition to constructing the underlying model, it is beneficial for understanding the intricacies of a simulation to visualise it in progress. However the simulation should not be functionally dependent on any UI -  it may be ran in the background, or with a visual wrapper. Demands of the UI are minimal as the target user of the software is a researcher; the UI should be able to: start, stop and reset a simulation; advance through the simulation one step at a time or continuously; and lastly the UI must provide a clear depiction of the model behaviour.
+
+\subsection{Road Networks}
+Loading a network into the system is best achieved by encoding a topology into a file on disk (given the \textit{.net} file extension) which can be read, and parsed, by the system at runtime - this strategy affords the researcher a quick and simple method of defining new networks in which to simulate an evacuation.
+
+A road network is defined by a collection of nodes in \textit{continuous space} - each having a pair of $(x,y)$ coordinates, a flag to signify if the node is an evacuation point (an \textit{exit flag}), and a flag to signify if agents may load onto the network via the node (a \textit{source flag}) - and a collection of edges, each specifying the node they are coming from (\textit{from node})and the node to which they are directed (\textit{to node}), optionally specifying a road length. If no road length is specified, length shall be interpolated as the linear distance between an edge's two nodes.
+
+Appropriately, the proprietary \textit{.net} file format is defined by the following rules:
+\begin{itemize}
+    \item A line beginning with the `\code{\#}' character defines the line as a comment, and is ignored by the parser.
+    \item A line composing only of `\code{<NODES>}' defines the following lines as representing nodes.
+    \item A line composing only of `\code{<EDGES>}' defines the following lines as representing edges.
+    \item A node line follows the format:
+    `\code{X-COORDINATE \: Y-COORDINATE \: EXIT-FLAG \: SOURCE-FLAG}'
+    where each argument is whitespace-sparated, \code{EXIT-FLAG} and \newline\code{SOURCE-FLAG} take values of zero for false and one for true.
+    \item  An edge line follows the format:
+    `\code{FROM-NODE-INDEX \: TO-NODE-INDEX \: (LENGTH)}'
+    where the node index is the $nth$ node to have been specified in the file. For example, the first node line found in a \textit{.net} file is addressed with a node index of `$1$'. The edge length is optional.
+    \item Edge definitions must reference nodes which are already themselves defined, an edge cannot reference a node which is defined later in the \textit{.net} file. It is therefore recommended to specify all nodes before specifying edges in a network file.
+\end{itemize}
+
+Figure \ref{fig:example_network} gives an example of a three node complete digraph in the form of an equilateral triangle - the example is given in both the encoding of a \textit{.net} network file and as the system interprets and visualises the network. Here, nodes are highlighted in black to more clearly visualise loading from a file to a road network, but nodes are not given a visualisation in the simulation proper. Note that this example network does not specify any road lengths, and hence all road lengths are extrapolated from the node locations. All network topologies are permitted within the program, however the simulation performance is not designed with very large scale simulations in mind. The simulation will be used to test evacuation strategies on small test networks and regional networks such as subsections of a city or on simplifications of major roads in a city.
+
+\begin{figure}
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+         \small{\verbatiminput{files/ExampleTriangleNet.txt}}
+         \caption{Network file encoding}
+         \label{fig:example_network_file}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.5\textwidth}
+        \centering
+         \includegraphics[width=\textwidth]{images/ExampleNetwork.png}
+         \caption{Corresponding simulation image}
+         \label{fig:example_network_vis}
+    \end{subfigure}
+    \caption{A triangular road network encoded as a file and visualised}
+    \label{fig:example_network}
+\end{figure}
+
+\subsection{Agent Specification}
+The program has two agent archetypes: the \textit{Car} and the \textit{Overseer}. Cars are the primary agent in the system and the subjects of the evacuation, they are modelled as point objects, but they have virtual dimensions according to a parameter. Overseer agents are those agents which do not necessarily have a contextual counterpart in the simulation, as their roles are to implement real-time features in the simulation. It is an Overseer which will implement evacuation strategies and control the scenario of the simulation. Unless stated otherwise, usages of the word \textit{agent} will refer to cars.
+
+When a car is initialised, it is randomly distributed to a source node. On initialisation, cars calculate their shortest path to a goal node using the A* search algorithm \cite{Hart1968APaths}. In the age of smartphones and satnav this assumption is appropriate. Traffic behaviour is governed by the N-S algorithm, but the specific parameters that adjust driving behaviour are configurable. The list of car driving parameters is:
+
+\begin{itemize}
+    \item Speed Limit
+    \item Acceleration
+    \item Vehicle buffer - The space kept between cars (their effective lengths)
+    \item Perception Radius - The distance at which a car can perceive its surroundings
+\end{itemize}
+
+Evacuation strategies - namely throttling and agent-greed - are to be implemented according to their definitions in Chapter \ref{ch:background}, and be toggle-able within the system. Each strategy's parameters are also highly configurable.
+
+\subsection{Simulation Configuration}
+A full list of configurable parameters, and their definitions, is given in Appendix \ref{appendix:parameters}. With such numerous variables, the project demands an easy method for researchers to set up a new scenario, test it, and set up an experiment that evaluates the effect of one or more independent variables on clearance time. As with the network topology, it is impractical to set up every new scenario within the system code itself, therefore it is fitting to use an external configuration file. Hence, a simulation requires two files to run, a configuration file and a network file. As all parameters are arbitrary and configurable, the simulation is agnostic towards which units are used for each variable as long as all variable units are consistent with each other. For example, if the researcher wants to configure velocity in miles per hour, distances must be given in miles to avoid unit errors - this is intuitive for any system that does not explicitly design for conflicting units. Unless specified, all default parameters are to be interpreted as SI units where applicable.
+
+\section{Experiment Specification}
+
+As stated in Chapter \ref{ch:background}, the metric to consider for every simulation run is \textit{clearance time} - the total time elapsed between the first evacuee leaving their source to the last evacuee reaching their destination.
+
+Research in this area is naturally sequential. Hypotheses are built on the findings of previous experiments, which motivate the formulation of the next scenario to put to simulation. See the experiments section for a detailed analysis of the sequential experimentation process.
+
+Initially, experiments on the effectiveness of throttling by Madireddy et al. (2011) will be replicated, and if necessary, the effect of throttling will be evaluated across different networks and under different simulation configurations.
+
+Regarding agent greed, Zhang et al. (2009) do not explore whether the \textit{greedy threshold} of an agent, the congestion level a road must reach for an agent to choose to divert its route, shares any clear relationship with clearance time. This relationship is evaluated in Chapter \ref{ch:experimentation}.
