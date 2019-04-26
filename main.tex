@@ -1,7 +1,7 @@
 \documentclass[12pt,a4paper]{report}
 
 \usepackage[utf8]{inputenc}
-\usepackage{tabularx} % extra features for tabular environment
+\usepackage{tabularx}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{multicol}
@@ -20,9 +20,12 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{float}
+\usepackage{fancyvrb}
+\usepackage{booktabs}
 \newcommand{\code}[1]{\texttt{#1}}
 \graphicspath{images/}
 \addbibresource{references.bib}
+\addbibresource{manual_references.bib}
 \emergencystretch=1em
 
 \pagenumbering{roman}
@@ -70,7 +73,11 @@
 \label{ch:conclusion}
 \input{chapters/conclusion.tex}
 
+\singlespacing
+
 \printbibliography
+
+\onehalfspacing
 
 \appendix
 \chapter{Structure of Project Directory}
@@ -80,6 +87,10 @@
 \chapter{List of Configurable Parameters}
 \label{appendix:parameters}
 \input{appendicies/parameters.tex}
+
+\chapter{Configuration File Format}
+\label{appendix:configuration}
+\input{appendicies/configuration.tex}
 
 \chapter{Complete System Class Diagram}
 \label{appendix:class_diagram}

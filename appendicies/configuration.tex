@@ -1,0 +1,84 @@
+Contents of a configuration XML file are first wrapped by a root \code{<experiment>} tag:
+\begin{figure}[H]
+    \centering
+        \begin{BVerbatim}[fontsize=\small]
+<experiment>
+.
+.
+.
+</experiment>
+        \end{BVerbatim}
+\end{figure}
+
+Simulation parameters are configured using the following XML tag:
+
+\begin{figure}[H]
+    \centering
+        \begin{BVerbatim}[fontsize=\small]
+<variable var="PARAMETERNAME">VALUE</variable> 
+        \end{BVerbatim}
+    \caption{Control variable XML format}
+    \label{fig:xml_control}
+\end{figure}
+
+Where \code{PARAMETER\_NAME} is the parameter name as stated in Appendix \ref{appendix:parameters}, and \code{VALUE} is the value to assign to the parameter. To configure a parameter to be an independent variable, include the \code{"varType="independent"} and \code{type="DATA\_TYPE"} attributes in the tag, and include the following nested tags: \code{<min>MIN\_VALUE</min>}, \code{<max>MAX\_VALUE</max>}, and \code{<interval>INTERVAL\_VALUE</interval>} where \code{DATA\_TYPE} is the data type of the independent variable (int, double and boolean supported), \code{MIN\_VALUE}, \code{MAX\_VALUE}, and \code{INTERVAL\_VALUE} are are the starting value over which to iterate the parameter, the maximum value, and the interval over which to step the parameter. An independent variable tag takes the following form:
+
+\vspace{0.5cm}
+\begin{figure}[H]
+        \centering
+        \begin{BVerbatim}[fontsize=\small]
+<variable var="populationSize" varType="independent" type="int">
+    <min> 1000 </min>
+    <max> 4000 </max>
+    <interval> 1000 </interval>
+</variable> 
+        \end{BVerbatim}
+    \caption{Independent variable XML format}
+    \label{fig:xml_independent}
+\end{figure}
+
+In addition to the \code{<varible>} tag which defines simulation-specific parameters, there are additional tags which define how the experiment is to run:
+
+\begin{itemize}
+    \item \code{<repeats>$n$</repeats>} \; - \; Repeats each simulation (at each independent variable permutation) $n$ times.
+    \item \code{<timeout>$n$</timeout>} \; - \; Kills a simulation run if the number of steps exceeds $n$.
+    \item \code{<name>\$name</timeout>} \; - \; Names the experiment \$name for quick comprehension. Output data files are given the name ``\$name.txt". If no name is specified, output data files are given the same name as the XML's filename.
+    \item \code{<network>...</network>} \; - \; Provides a network file or specifies a procedural network to build..
+\end{itemize}
+
+The \code{<network>} tag takes two forms, read from file and generate grid from parameters, the read from file tag is the simplest of the two:
+
+\vspace{0.5cm}
+\begin{figure}[H]
+        \centering
+        \begin{BVerbatim}[fontsize=\small]
+<network type="path">
+    <filepath>\$path</filepath>
+</network>
+        \end{BVerbatim}
+    \caption{Network from file XML format}
+    \label{fig:xml_fileNet}
+\end{figure}
+
+\begin{sloppypar}
+Here, the \$path can be specified as an absolute path or relative to where Java is executing the program. Most likely Java is executing the program from the project root directory, in which case the following example path is valid:\\ ``config/networks/SiouxFalls\_allSources.net".
+\end{sloppypar}
+
+To configure a procedural grid, the \code{<network>} tag takes the following form: 
+
+\vspace{0.5cm}
+\begin{figure}[H]
+        \centering
+        \begin{BVerbatim}[fontsize=\small]
+<network type="grid">
+    <size>n</size>
+    <roadLength>l</roadlength>
+</network>
+        \end{BVerbatim}
+    \caption{Procedurally generated grid XML format}
+    \label{fig:xml_gridNet}
+\end{figure}
+
+Which constructs a network of $n \times n$ Junctions, where each connecting road segment has length $l$.
+
+For examples of configuration files, see the config folder in the project root directory.

@@ -8,7 +8,13 @@ Microsimulation is more computationally taxing than macrosimulation, demanding p
 
 Microscopic simulation of road networks started becoming computationally feasible in the 1990s, beginning a surge of research that attempted, and succeed, to accurately model road traffic \cite{Nagel1992ATraffic}. As computing power increased further, ABM research accelerated rapidly in the 21st century \cite{Bonabeau2002Agent-basedSystems.,Teodorovic2003TransportApproach}.
 
-\section{Objective}
-This report describes the implementation of a robust simulation for\textit{in silico} evacuation experimentation, and
+\section{Overview}
+This report describes the formulation, design and implementation of a multi-agent simulation program for traffic-based evacuation scenarios - and experimentally investigates the impact different strategies and scenario effects can have on evacution time.
 
-Initially, the paper will overview the general design elements of agent-based modelling, with further explanation given to its implementation in an evacuation context. Existing evacuation models will be considered, and the state of modern ABM systems understood before investigating how researchers have previously leveraged ABM to engineer new strategies for evacuation. The paper will analyse prior research, and speculate on potential advances for additional study. 
+Chapter \ref{ch:background} will introduce the background behind the field of agent-based modelling, initially from an abstract context and then within the realm of traffic simulation. We will consider how similar evacuation models have been leveraged, to provide an understanding of the problem space wherein this project lies.
+
+The Project Specification section first gives a formal designation of the project aims - thereafter specifying, in explicit terms, the high-level functional requirements of the program, the program capabilities, and the description of fundamental aspects of the simulation itself. Here, we shall have an understanding of what the system does and broadly how it will attempt to do so. 
+
+System design is addressed in Chapter \ref{ch:design}, giving an overview of how the system's components interact with each other.
+
+The Implementation section explores the realisation of core system components. In particular, we cover the framework for moving within road networks, and the associated algorithms that dictate agent behaviours.
